@@ -1,36 +1,38 @@
 import pandas as pd
 import nltk as nl
+from nltk.tokenize import TweetTokenizer
 
 def preprocess_text(text):
 
+    # Initialize tokenizer
+    tokenizer = TweetTokenizer(preserve_case=False, strip_handles=True, reduce_len=True)
+
     # Tokenize the text and turn into lowercase
-    tokens = nl.word_tokenize(text)
+    tokens = tokenizer.tokenize(text)
     tokens = [token.lower() for token in tokens]
 
     # Remove stopwords
-    stopwords = nl.corpus.stopwords.words('english')
+    stopwords = set(nl.corpus.stopwords.words('english'))
     tokens = [token for token in tokens if token not in stopwords]
 
-    # Remove punctuation
+    # Remove punctuation and non-alphabetic characters
     tokens = [token for token in tokens if token.isalpha()]
 
-    # Stemming
+    # Lemmatization
     lemmatizer = nl.stem.WordNetLemmatizer()
     tokens = [lemmatizer.lemmatize(token) for token in tokens]
 
-    # Remove hashtags
-    tokens = [token for token in tokens if token.startswith('#') == False]
-
-    # Remove mentions
-    tokens = [token for token in tokens if token.startswith('@') == False]
-
     # Remove links
-    tokens = [token for token in tokens if token.startswith('http://') == False]
+    tokens = [token for token in tokens if not token.startswith('http')]
 
-    # Remove empty tokens
-    tokens = [token for token in tokens if token != '']
+    # Remove tokens with hashtags
+    tokens = [token for token in tokens if not token.startswith('#')]
 
-    return tokens
+    # Join tokens into a string
+    processed_text = ' '.join(tokens)
+
+    return processed_text
+
 
 def preprocess_data(df):
 
@@ -44,9 +46,14 @@ def preprocess_data(df):
 
 path = './Dataset/dataset.csv'
 df = pd.read_csv(path)
+
+# Reducing df to 10 datasets just for testing
+df = df.head(10)
+
 text, labels = preprocess_data(df)
 print(text[0:5])
 print(labels[0:5])
+
 
 
 
