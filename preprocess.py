@@ -36,8 +36,8 @@ def preprocess_text(text):
 
 def preprocess_data(df):
 
-    text = df['Text'].tolist()
-    labels = df['Label'].tolist()
+    text = df[df['Language'] == 'en']['Text'].tolist()
+    labels = df[df['Language'] == 'en']['Label'].tolist()
 
     # Preprocess text
     text = [preprocess_text(t) for t in text]
