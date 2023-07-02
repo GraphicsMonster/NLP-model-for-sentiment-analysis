@@ -33,6 +33,21 @@ def preprocess_text(text):
 
     return processed_text
 
+def preprocess_labels(labels):
+
+    #convert labels to integral values
+    label_map = {
+        'positive': 1,
+        'negative': -1,
+        'uncertainty': 0,
+        'litigious': 2
+    }
+
+    # mapping labels to the label map
+    processed_labels = [label_map[label] for label in labels]
+
+    return processed_labels
+
 
 def preprocess_data(df):
 
@@ -41,18 +56,9 @@ def preprocess_data(df):
 
     # Preprocess text
     text = [preprocess_text(t) for t in text]
+    labels = preprocess_labels(labels)
     
     return text, labels
-
-path = './Dataset/dataset.csv'
-df = pd.read_csv(path)
-
-# Reducing df to 10 datasets just for testing
-df = df.head(10)
-
-text, labels = preprocess_data(df)
-print(text[0:5])
-print(labels[0:5])
 
 
 
