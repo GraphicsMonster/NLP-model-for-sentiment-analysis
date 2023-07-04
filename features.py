@@ -4,7 +4,7 @@ import pandas as pd
 from preprocess import preprocess_data
 
 def get_features(text):
-    vectorizer = CountVectorizer(ngram_range=(1,2))
+    vectorizer = CountVectorizer(ngram_range=(1,2)) 
     features = vectorizer.fit_transform(text)
     return features, vectorizer.get_feature_names_out()
 
