@@ -5,7 +5,7 @@ class Conv1DLayer:
     def __init__(self, num_filters, filter_size):
         self.num_filters = num_filters
         self.filter_size = filter_size
-        self.conv_filter = np.random.randn(num_filters, filter_size)
+        self.conv_filter = np.random.randn(filter_size, num_filters)
 
     def loss(self, pred, target):
         # compute loss function
@@ -15,12 +15,12 @@ class Conv1DLayer:
         self.inputs = inputs
         num_inputs = inputs.shape[0]
         output_length = num_inputs - self.filter_size + 1
-        self.output = np.zeros((num_inputs, output_length, self.num_filters))
+        self.output = np.zeros((output_length, self.num_filters))
         # Convolution
         # input dim is basically the size of the vocabulary
 
         for i in range(output_length):
-            self.output[i] = np.dot(inputs[i:i+self.filter_size], self.conv_filter)
+            self.output[i] = np.dot(inputs[i:i+self.filter_size], self.conv_filter.T)
 
         return self.output
     
@@ -31,4 +31,10 @@ class Conv1DLayer:
         for i in range(grad_outputs.shape[0]):
             for j in range(self.num_filters):
                receptive_field = self.inputs[i:i+self.filter_size]
-               grad_filter[j] += np.sum(receptive_field * grad_outputs[i, j])
+               grad_input[i:i+self.filter_size] += self.conv_filter[:, j] * grad_outputs[i, j]
+               grad_filter[:, j] += receptive_field * grad_outputs[i, j]
+
+            # Update the weights
+            self.conv_filter -= learning_rate * grad_filter
+
+        return grad_input
