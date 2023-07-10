@@ -1,4 +1,5 @@
 import numpy as np
+import tensorflow as tf
 
 class Conv1DLayer:
 
@@ -22,6 +23,7 @@ class Conv1DLayer:
         for i in range(output_length):
             receptive_field = inputs[i:i+self.filter_size]
             self.output[i] = np.dot(receptive_field, self.conv_filter).reshape(self.num_filters)
+            self.output[i] = tf.nn.relu(self.output[i])
 
         return self.output
     
@@ -55,4 +57,4 @@ conv_layer = Conv1DLayer(num_filters, filter_size)
 output = conv_layer.forward(inputs)
 
 # Print the output shape
-print("Output shape:", output.shape)
+print(output)

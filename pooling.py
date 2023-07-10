@@ -1,7 +1,7 @@
 import numpy as np
 
 class PoolingLayer:
-    
+
     def __init__(self, pool_size):
         self.pool_size = pool_size
 
@@ -16,7 +16,7 @@ class PoolingLayer:
 
         return self.output
     
-    def backwawrd(self, grad_outputs):
+    def backward(self, grad_outputs):
         grad_inputs = np.zeros(self.inputs.shape)
         batch_size, input_size = grad_outputs.shape
 
@@ -26,3 +26,13 @@ class PoolingLayer:
 
         return grad_inputs
 
+# Create a random input data
+batch_size = 2
+input_size = 6
+
+inputs = np.random.randn(batch_size, input_size)
+print(inputs)
+
+poolinglayer = PoolingLayer(2)
+output = poolinglayer.forward(inputs)
+print(output)
