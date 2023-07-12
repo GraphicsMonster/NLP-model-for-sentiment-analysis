@@ -14,6 +14,14 @@ class ClassificationLayer:
         self.output = np.exp(self.output)
         self.output_probs = self.output / np.sum(self.output, axis=1, keepdims=True)
         return self.output_probs
+    
+    def loss(self, pred_probs, targets):
+        num_samples = targets.shape[0]
+        correct_probs = pred_probs[np.arange(num_samples), targets]
+        loss = -np.log(correct_probs)
+        total_loss = np.sum(loss) / num_samples
+        return total_loss
+        # this is the cross entropy loss function
 
     def backward(self, grad_outputs):
         self.grad_inputs = np.dot(grad_outputs, self.weights.T)
