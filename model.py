@@ -1,4 +1,7 @@
 import numpy as np
+import pandas as pd
+from preprocess import preprocess_data
+from features import get_features
 from convolution import Conv1DLayer
 from pooling import PoolingLayer
 from fullyconnectedlayer import FullyConnectedLayer
@@ -27,7 +30,7 @@ class SentimentAnalysisModel:
         for epoch in range(num_epochs):
 
             total_loss = 0.0
-            num_batches = len(X) // batch_size
+            num_batches = X.shape[0] // batch_size
 
             for batch in range(num_batches):
 
@@ -67,6 +70,32 @@ class SentimentAnalysisModel:
         # return the class with the highest probability
         return np.argmax(probs, axis=1)
     
+# Testing the model with a small dataset
+
+path = './Dataset/dataset.csv'
+df = pd.read_csv(path)
+df = df[:100]
+
+# Preprocess the data
+X, labels = preprocess_data(df)
+
+# Get the features
+X, vocab = get_features(X)
+
+# Initialize the model
+model = SentimentAnalysisModel(num_filters=10, filter_size=3, pool_size=2, hidden_units=10, num_classes=2, learning_rate=0.01)
+
+# Train the model
+model.train(X, labels, num_epochs=10, batch_size=32)
+
+# Test the model
+preds = model.predict(X)
+print(preds)
+print(labels)
+print("Accuracy = {}".format(np.mean(preds == labels)))
+
+
+
 
 
                 

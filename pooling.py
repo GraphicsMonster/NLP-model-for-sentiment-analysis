@@ -25,14 +25,3 @@ class PoolingLayer:
                 grad_inputs[i, j*self.pool_size:(j+1)*self.pool_size] = grad_outputs[i, j]
 
         return grad_inputs
-
-# Create a random input data
-batch_size = 2
-input_size = 6
-
-inputs = np.random.randn(batch_size, input_size)
-print(inputs)
-
-poolinglayer = PoolingLayer(2)
-output = poolinglayer.forward(inputs)
-print(output)
