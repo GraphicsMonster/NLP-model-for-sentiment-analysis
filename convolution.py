@@ -15,13 +15,13 @@ class Conv1DLayer:
         self.inputs = inputs
         num_inputs = inputs.shape[1]
         output_length = num_inputs - self.filter_size + 1
-        self.output = np.zeros((output_length, self.num_filters))
+        self.output = np.zeros((self.num_filters, output_length))
         # Convolution
         # input dim is basically the size of the vocabulary
 
         for i in range(output_length):
             receptive_field = inputs[i:i+self.filter_size]
-            self.output[i] = np.dot(receptive_field, self.conv_filter).reshape(self.num_filters)
+            self.output[i] = np.dot(receptive_field, self.conv_filter).reshape(self.num_filters, 1)
             self.output[i] = np.maximum(0, self.output[i])
 
         return self.output
@@ -40,20 +40,3 @@ class Conv1DLayer:
             self.conv_filter -= learning_rate * grad_filter
 
         return grad_input
-    
-
-# Create a random input data
-batch_size = 1
-input_size = 3
-inputs = np.random.randn(batch_size, input_size)
-
-# Create an instance of the Conv1DLayer
-num_filters = 4
-filter_size = 3
-conv_layer = Conv1DLayer(num_filters, filter_size)
-
-# Perform the forward pass
-output = conv_layer.forward(inputs)
-
-# Print the output shape
-print(output)
