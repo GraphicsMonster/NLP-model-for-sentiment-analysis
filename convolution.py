@@ -7,9 +7,6 @@ class Conv1DLayer:
         self.filter_size = filter_size
         self.conv_filter = np.random.randn(filter_size, 1)
 
-    def loss(self, pred, target):
-        # compute loss function
-        return np.mean((pred - target) ** 2)
 
     def forward(self, inputs):
         self.inputs = inputs
@@ -18,18 +15,15 @@ class Conv1DLayer:
         self.output = np.zeros((self.num_filters, output_length))
         # Convolution
         # input dim is basically the size of the vocabulary
-        print("input dim: ", inputs.shape)
-        print("filter dim: ", self.conv_filter.shape)
-        print("filter size: ", self.filter_size)
-        print("output dim: ", self.output.shape)
-        print("output length: ", output_length)
+        
         for i in range(output_length):
+            
             if i+self.filter_size > num_inputs:
                 break
             receptive_field = inputs[i:i+self.filter_size, 1].toarray()
-            print("receptive field dim: ", receptive_field.shape)
             self.output[:, i] = np.dot(receptive_field.T, self.conv_filter)
-            print("output at" + str(i) + str(self.output[:, i]))
+
+            # Applying activation function(RELU)
             self.output[:, i] = np.maximum(0, self.output[:, i])
 
         return self.output
