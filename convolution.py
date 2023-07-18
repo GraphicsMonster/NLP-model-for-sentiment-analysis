@@ -21,11 +21,11 @@ class Conv1DLayer:
             if i+self.filter_size > num_inputs:
                 break
             receptive_field = inputs[:, i:i+self.filter_size].toarray()
-            self.output[:, i] = np.sum(np.dot(receptive_field, self.conv_filter))
+            self.output[:, i] = np.sum(np.dot(receptive_field, self.conv_filter), axis=0)
 
             # Applying activation function(RELU)
             self.output[:, i] = np.maximum(0, self.output[:, i])
-
+            
         return self.output
     
     def backward(self, grad_outputs, learning_rate):

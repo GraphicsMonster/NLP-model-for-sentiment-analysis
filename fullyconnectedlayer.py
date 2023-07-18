@@ -12,7 +12,7 @@ class FullyConnectedLayer:
 
     def forward(self, inputs):
         self.inputs = inputs
-        self.outputs = np.dot(inputs, self.weights.T) + self.biases
+        self.outputs = np.dot(inputs.T, self.weights) + self.biases
         return self.outputs
     
     def backward(self, grad_outputs, learning_rate):
