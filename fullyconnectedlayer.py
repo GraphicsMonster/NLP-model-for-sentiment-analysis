@@ -16,8 +16,8 @@ class FullyConnectedLayer:
         return self.outputs
     
     def backward(self, grad_outputs, learning_rate):
-        self.grad_inputs = np.dot(grad_outputs, self.weights)
-        self.grad_weights = np.dot(grad_outputs.T, self.inputs)
+        self.grad_inputs = np.dot(grad_outputs, self.weights.T)
+        self.grad_weights = np.dot(self.inputs, grad_outputs)
         self.grad_biases = np.sum(grad_outputs, axis=0)
-        self.weights -= learning_rate * self.grad_weights
+        self.weights -= learning_rate * self.grad_weights.T
         return self.grad_inputs
