@@ -11,10 +11,11 @@ class ClassificationLayer:
     def forward(self, inputs):
         self.inputs = inputs
         self.output = np.dot(inputs, self.weights) + self.biases
-        self.output = np.exp(self.output)
-        self.output_probs = self.output / np.sum(self.output, axis=1, keepdims=True)
+        self.output = self.output - np.max(self.output, axis=1, keepdims=True)  # To prevent overflow
+        self.output_probs = np.exp(self.output) / np.sum(np.exp(self.output), axis=1, keepdims=True)
+
         return self.output_probs
-    
+
     def loss(self, pred_probs, targets):
         num_samples = len(targets)
         targets = np.array(targets)
