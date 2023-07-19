@@ -86,7 +86,7 @@ X, vocab = get_features(X)
 model = SentimentAnalysisModel(num_filters=10, filter_size=3, pool_size=2, hidden_units=10, num_classes=2, learning_rate=0.01)
 
 # Train the model
-model.train(X, labels, num_epochs=10, batch_size=32)
+model.train(X, labels, num_epochs=100, batch_size=32)
 
 # Test the model
 preds = model.predict(X)

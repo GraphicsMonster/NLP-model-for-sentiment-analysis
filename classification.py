@@ -17,6 +17,8 @@ class ClassificationLayer:
     
     def loss(self, pred_probs, targets):
         num_samples = len(targets)
+        targets = np.array(targets)
+        targets -= 1
         correct_probs = pred_probs[np.arange(num_samples), targets]
         loss = -np.log(correct_probs)
         total_loss = np.sum(loss) / num_samples

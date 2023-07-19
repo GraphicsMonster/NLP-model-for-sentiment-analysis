@@ -29,16 +29,18 @@ class Conv1DLayer:
         return self.output
     
     def backward(self, grad_outputs, learning_rate):
-        grad_input = np.zeros(grad_outputs.shape)
+        grad_input = np.zeros(self.inputs.shape)
         grad_filter = np.zeros(self.conv_filter.shape)
 
-        for i in range(grad_outputs.shape[0]):
+        for i in range(grad_outputs.shape[1]):
             for j in range(self.num_filters):
-               receptive_field = self.inputs[i:i+self.filter_size]
-               grad_input[i:i+self.filter_size] += self.conv_filter[:, j] * grad_outputs[i, j]
-               grad_filter[:, j] += receptive_field * grad_outputs[i, j]
+                receptive_field = self.inputs[:, i:i+self.filter_size].toarray()
+                filter = self.conv_filter.T
+                grad_input[:, i:i+self.filter_size] += np.sum(np.outer(filter, grad_outputs[j, i]))
+                grad_filter += np.sum(np.outer(receptive_field, grad_outputs[j, i]))
 
-            # Update the weights
-            self.conv_filter -= learning_rate * grad_filter
+        # Update the weights
+        self.conv_filter -= learning_rate * grad_filter
 
         return grad_input
+
