@@ -17,11 +17,13 @@ class PoolingLayer:
         return self.output
     
     def backward(self, grad_outputs):
-        grad_inputs = np.zeros(self.inputs.shape)
+        grad_inputs = np.zeros(grad_outputs.shape)
         batch_size, input_size = grad_outputs.shape
+        print("batch size and input_size", grad_outputs.shape)
 
         for i in range(batch_size):
             for j in range(input_size):
+
                 grad_inputs[i, j*self.pool_size:(j+1)*self.pool_size] = grad_outputs[i, j]
 
         return grad_inputs
