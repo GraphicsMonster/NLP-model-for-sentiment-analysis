@@ -10,24 +10,20 @@ class ClassificationLayer:
 
     def forward(self, inputs):
         self.inputs = inputs
-        self.output = np.dot(inputs, self.weights) + self.biases
-        self.output = self.output - np.max(self.output, axis=1, keepdims=True)  # To prevent overflow
-        self.output_probs = np.exp(self.output) / np.sum(np.exp(self.output), axis=1, keepdims=True)
+        self.logits = np.dot(inputs, self.weights) + self.biases
+        self.logits -= np.max(self.logits, axis=1, keepdims=True)  # Stability trick to prevent overflow
+        self.probs = np.exp(self.logits) / np.sum(np.exp(self.logits), axis=1, keepdims=True)
 
-        return self.output_probs
+        return self.probs
 
     def loss(self, pred_probs, targets):
         num_samples = len(targets)
-        targets = np.array(targets)
-        targets -= 1
-        correct_probs = pred_probs[np.arange(num_samples), targets]
-        loss = -np.log(correct_probs)
-        total_loss = np.sum(loss) / num_samples
-        return total_loss
-        # this is the cross entropy loss function
+        loss = -np.sum(targets * np.log(pred_probs + 1e-10)) / num_samples
+        return loss
 
-    def backward(self, grad_outputs):
-        self.grad_inputs = np.dot(grad_outputs, self.weights.T)
-        self.grad_weights = np.dot(self.inputs.T, grad_outputs)
-        self.grad_biases = np.sum(grad_outputs, axis=0)
+    def backward(self, grad_probs, targets):
+        num_samples = len(targets)
+        self.grad_inputs = (grad_probs - targets) / num_samples
+        self.grad_weights = np.dot(self.inputs.T, self.grad_inputs)
+        self.grad_biases = np.sum(self.grad_inputs, axis=0)
         return self.grad_inputs
