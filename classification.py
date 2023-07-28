@@ -24,6 +24,7 @@ class ClassificationLayer:
     def backward(self, grad_probs, targets):
         num_samples = len(targets)
         self.grad_inputs = (grad_probs - targets) / num_samples
-        self.grad_weights = np.dot(self.inputs.T, self.grad_inputs)
+        self.grad_weights = np.dot(self.inputs.T, self.grad_inputs.reshape(-1, 1))
         self.grad_biases = np.sum(self.grad_inputs, axis=0)
         return self.grad_inputs
+

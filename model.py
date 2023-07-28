@@ -28,6 +28,8 @@ class SentimentAnalysisModel:
 
         num_batches = X.shape[0] // batch_size
         total_loss = 0.0
+        
+        labels = self.one_hot_encode(labels)
 
     # Training the model
         for epoch in range(num_epochs):
@@ -89,6 +91,7 @@ X, labels = preprocess_data(df)
 
 # Get the features
 X, vocab = get_features(X)
+print("vocab length: ", len(vocab))
 
 # Convert labels to one-hot encoding
 num_classes = 4
@@ -98,7 +101,7 @@ one_hot_labels = np.eye(num_classes)[labels].astype(float)
 model = SentimentAnalysisModel(num_filters=10, filter_size=3, pool_size=2, hidden_units=10, num_classes=num_classes, learning_rate=0.01)
 
 # Train the model
-model.train(X, one_hot_labels, num_epochs=100, batch_size=32)
+model.train(X, labels, num_epochs=100, batch_size=32)
 
 # Test the model
 preds = model.predict(X)
