@@ -99,7 +99,7 @@ num_classes = 4
 one_hot_labels = np.eye(num_classes)[labels].astype(float)
 
 # Initialize the model
-model = SentimentAnalysisModel(num_filters=10, filter_size=3, pool_size=2, hidden_units=10, num_classes=num_classes, learning_rate=0.01)
+model = SentimentAnalysisModel(num_filters=10, filter_size=3, pool_size=4, hidden_units=10, num_classes=num_classes, learning_rate=0.01)
 
 # Train the model
 model.train(X, labels, num_epochs=100, batch_size=10)
