@@ -10,6 +10,7 @@ class ClassificationLayer:
 
     def forward(self, inputs):
         self.inputs = inputs
+        print("inputs shape during classification forward pass: ", self.inputs.shape)
         self.logits = np.dot(inputs, self.weights) + self.biases
         self.logits -= np.max(self.logits, axis=1, keepdims=True)  # Stability trick to prevent overflow
         self.probs = np.exp(self.logits) / np.sum(np.exp(self.logits), axis=1, keepdims=True)
@@ -22,6 +23,7 @@ class ClassificationLayer:
         return loss
 
     def backward(self, grad_probs, targets):
+        print("input shape during classification backpass: ", self.inputs.shape)
         num_samples = len(targets)
         self.grad_inputs = (grad_probs - targets) / num_samples
         self.grad_weights = np.dot(self.inputs.T, self.grad_inputs.reshape(-1, 1))

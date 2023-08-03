@@ -12,6 +12,7 @@ class FullyConnectedLayer:
 
     def forward(self, inputs):
         self.inputs = inputs
+        print("inputs shape during flc backpass: ", self.inputs.shape)
         self.outputs = np.dot(inputs.T, self.weights) + self.biases
         return self.outputs
     

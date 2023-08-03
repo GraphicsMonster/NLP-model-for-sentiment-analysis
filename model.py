@@ -41,6 +41,7 @@ class SentimentAnalysisModel:
                 batch_start = batch * batch_size
                 batch_end = batch_start + batch_size
                 inputs = X[batch_start:batch_end]
+                print("inputs shape", inputs.shape)
                 targets = labels[batch_start:batch_end]
 
                 # Forward pass
@@ -101,7 +102,7 @@ one_hot_labels = np.eye(num_classes)[labels].astype(float)
 model = SentimentAnalysisModel(num_filters=10, filter_size=3, pool_size=2, hidden_units=10, num_classes=num_classes, learning_rate=0.01)
 
 # Train the model
-model.train(X, labels, num_epochs=100, batch_size=32)
+model.train(X, labels, num_epochs=100, batch_size=10)
 
 # Test the model
 preds = model.predict(X)

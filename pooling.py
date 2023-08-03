@@ -7,6 +7,7 @@ class PoolingLayer:
 
     def forward(self, inputs):
         self.inputs = inputs
+        print("inputs shape during pooling forward pass: ", self.inputs.shape)
         batch_size, input_size = inputs.shape
         self.output = np.zeros((batch_size, input_size // self.pool_size))
         
