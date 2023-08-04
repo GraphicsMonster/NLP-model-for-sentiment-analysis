@@ -16,8 +16,8 @@ class FullyConnectedLayer:
         self.biases = np.zeros(self.output_size)
 
         if self.hidden_units is not None:
-            self.hidden_weights = np.random.randn(self.input_size, self.hidden_units)
-            self.hidden_biases = np.zeros(self.input_size)
+            self.hidden_weights = np.random.randn(self.hidden_units, self.input_size)
+            self.hidden_biases = np.zeros(self.hidden_units)
 
     def forward(self, inputs):
         if self.weights is None or self.biases is None:
@@ -27,7 +27,7 @@ class FullyConnectedLayer:
         inputs = inputs.reshape(batch_size, num_filters * input_sequence_length)  # Flatten the inputs
 
         if self.hidden_units is not None:
-            hidden_outputs_dot = np.dot(inputs.T, self.hidden_weights.T)
+            hidden_outputs_dot = np.dot(inputs.T, self.hidden_weights)
             print("hidden weight shape: ", self.hidden_weights.shape)
             print("hidden outputs dot product: ", hidden_outputs_dot.shape)
             hidden_outputs = hidden_outputs_dot + self.hidden_biases
