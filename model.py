@@ -9,7 +9,7 @@ from classification import ClassificationLayer
 
 class SentimentAnalysisModel:
 
-    def __init__(self, num_filters, filter_size, pool_size, hidden_units, num_classes, learning_rate):
+    def __init__(self, num_filters, filter_size, pool_size, input_size, output_size, hidden_units, num_classes, learning_rate):
 
         self.num_filters = num_filters
         self.filter_size = filter_size
@@ -21,7 +21,7 @@ class SentimentAnalysisModel:
         # Initialize the layers
         self.conv_layer = Conv1DLayer(num_filters, filter_size)
         self.pool_layer = PoolingLayer(pool_size)
-        self.fc_layer = FullyConnectedLayer(num_filters, hidden_units)
+        self.fc_layer = FullyConnectedLayer(input_size, output_size, hidden_units)
         self.classification_layer = ClassificationLayer(hidden_units, num_classes)
 
     def train(self, X, labels, num_epochs, batch_size):
@@ -99,7 +99,7 @@ num_classes = 4
 one_hot_labels = np.eye(num_classes)[labels].astype(float)
 
 # Initialize the model
-model = SentimentAnalysisModel(num_filters=10, filter_size=3, pool_size=4, hidden_units=10, num_classes=num_classes, learning_rate=0.01)
+model = SentimentAnalysisModel(num_filters=10, filter_size=3, pool_size=4, input_size=14, output_size=7, hidden_units=10, num_classes=num_classes, learning_rate=0.01)
 
 # Train the model
 model.train(X, labels, num_epochs=100, batch_size=10)
