@@ -1,32 +1,46 @@
 import numpy as np
 
 class ClassificationLayer:
-
-    def __init__(self, input_size, output_size):
+    def __init__(self, input_size, num_classes):
         self.input_size = input_size
-        self.output_size = output_size
-        self.weights = np.random.randn(input_size, output_size)
-        self.biases = np.random.randn(output_size)
+        self.num_classes = num_classes
+        self.weights = None
+        self.biases = None
+
+    def initialize_parameters(self):
+        self.weights = np.random.randn(self.input_size, self.num_classes)
+        self.biases = np.random.randn(self.num_classes)
 
     def forward(self, inputs):
-        self.inputs = inputs
-        print("inputs shape during classification forward pass: ", self.inputs.shape)
-        self.logits = np.dot(inputs, self.weights) + self.biases
-        self.logits -= np.max(self.logits, axis=1, keepdims=True)  # Stability trick to prevent overflow
-        self.probs = np.exp(self.logits) / np.sum(np.exp(self.logits), axis=1, keepdims=True)
+        if self.weights is None or self.biases is None:
+            self.initialize_parameters()
 
-        return self.probs
-
-    def loss(self, pred_probs, targets):
-        num_samples = len(targets)
-        loss = -np.sum(targets * np.log(pred_probs + 1e-10)) / num_samples
+        outputs = np.dot(inputs, self.weights.T) + self.biases
+        outputs = self.softmax(outputs)
+        print("output shape during classification layer's forward pass: ", outputs.shape)
+        return outputs
+    
+    def softmax(self, logits):
+        max_logits = np.max(logits, axis=1, keepdims=True)
+        exp_logits = np.exp(logits - max_logits)
+        return exp_logits / np.sum(exp_logits, axis=1, keepdims=True)
+    
+    def loss(self, probs, targets):
+        num_samples = probs.shape[0]
+        loss = -np.sum(targets * np.log(probs)) / num_samples
         return loss
-
-    def backward(self, grad_probs, targets):
-        print("input shape during classification backpass: ", self.inputs.shape)
+    
+    def backward(self, probs, targets, learning_rate):
         num_samples = len(targets)
-        self.grad_inputs = (grad_probs - targets) / num_samples
-        self.grad_weights = np.dot(self.inputs.T, self.grad_inputs.reshape(-1, 1))
-        self.grad_biases = np.sum(self.grad_inputs, axis=0)
-        return self.grad_inputs
+        grad_logits = probs - targets
+        grad_inputs = np.dot(grad_logits, self.weights.T)
+
+        grad_weights = np.dot(grad_inputs.T, grad_logits) / num_samples
+        grad_biases = np.sum(grad_logits, axis=0) / num_samples
+
+        # Update parameters using gradients
+        self.weights -= learning_rate * grad_weights
+        self.biases -= learning_rate * grad_biases
+
+        return grad_inputs
 
