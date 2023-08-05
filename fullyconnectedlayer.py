@@ -50,22 +50,27 @@ class FullyConnectedLayer:
             grad_hidden = np.dot(grad_outputs, self.weights.T)
             grad_hidden[hidden_outputs <= 0] = 0  # ReLU backward for the hidden layer
 
-            grad_hidden_weights = np.dot(hidden_outputs.T, grad_outputs)  # Take transpose here
+            grad_hidden_weights = np.dot(hidden_outputs.T, grad_hidden)  # Take transpose here
             grad_hidden_biases = np.sum(grad_hidden, axis=0)
+            print("the shape of grad_hidden_weights is: ", grad_hidden_weights.shape)
 
             # Update hidden parameters using gradients
-            rateXweights = (learning_rate * self.hidden_weights) / batch_size
+            rateXweights = (learning_rate * grad_hidden_weights) / batch_size
             self.hidden_weights -= rateXweights
             self.hidden_biases -= learning_rate * grad_hidden_biases / batch_size
 
 
         grad_weights = np.dot(grad_outputs.T, grad_outputs.reshape(batch_size, -1))
+        grad_weights = np.sum(grad_weights, axis=0)
         grad_biases = np.sum(grad_outputs, axis=0)
 
         # Update output parameters using gradients
-        rateXweights = (learning_rate * self.weights) / batch_size
+        rateXweights = (learning_rate * grad_weights) / batch_size
+        print("grad_weights shape", grad_weights.shape)
+        print("rateXweights shape: ", rateXweights.shape)
         self.weights -= rateXweights
         self.biases -= learning_rate * grad_biases / batch_size
 
+        print("output shape during FC backpass: ", grad_inputs.shape)
         return grad_inputs
 

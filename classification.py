@@ -42,5 +42,6 @@ class ClassificationLayer:
         self.weights -= learning_rate * grad_weights
         self.biases -= learning_rate * grad_biases
 
+        print("output shape during classification layer's backpass: ", grad_inputs.shape)
         return grad_inputs
 

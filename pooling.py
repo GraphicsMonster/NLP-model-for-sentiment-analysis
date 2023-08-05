@@ -33,4 +33,5 @@ class PoolingLayer:
                     end = start + self.pool_size
                     grad_inputs[batch, start:end, filter] = grad_outputs[batch, i, filter]
 
+        print("shape of the output of backpass of pooling layer: ", grad_inputs.shape)
         return grad_inputs
