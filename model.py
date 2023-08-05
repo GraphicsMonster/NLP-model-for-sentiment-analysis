@@ -9,7 +9,7 @@ from classification import ClassificationLayer
 
 class SentimentAnalysisModel:
 
-    def __init__(self, num_filters, filter_size, pool_size, hidden_units, num_classes, learning_rate):
+    def __init__(self, num_filters, filter_size, pool_size, input_size, output_size, hidden_units, num_classes, learning_rate):
 
         self.num_filters = num_filters
         self.filter_size = filter_size
@@ -21,8 +21,8 @@ class SentimentAnalysisModel:
         # Initialize the layers
         self.conv_layer = Conv1DLayer(num_filters, filter_size)
         self.pool_layer = PoolingLayer(pool_size)
-        self.fc_layer = FullyConnectedLayer(num_filters, hidden_units)
-        self.classification_layer = ClassificationLayer(hidden_units, num_classes)
+        self.fc_layer = FullyConnectedLayer(input_size, output_size, hidden_units)
+        self.classification_layer = ClassificationLayer(input_size=output_size, num_classes=num_classes) #The number of input neurons in the classification layer are equal to the number of output neurons of the FC layer.
 
     def train(self, X, labels, num_epochs, batch_size):
 
@@ -41,6 +41,7 @@ class SentimentAnalysisModel:
                 batch_start = batch * batch_size
                 batch_end = batch_start + batch_size
                 inputs = X[batch_start:batch_end]
+                print("inputs shape", inputs.shape)
                 targets = labels[batch_start:batch_end]
 
                 # Forward pass
@@ -54,7 +55,7 @@ class SentimentAnalysisModel:
                 total_loss += loss
 
                 # Backward pass
-                grad_probs = np.array([self.classification_layer.backward(prob, target) for prob, target in zip(probs, targets)])
+                grad_probs = np.array([self.classification_layer.backward(prob, target, self.learning_rate) for prob, target in zip(probs, targets)])
                 grad_fc = self.fc_layer.backward(grad_probs, self.learning_rate)
                 grad_pool = self.pool_layer.backward(grad_fc)
                 grad_conv = self.conv_layer.backward(grad_pool, self.learning_rate)
@@ -98,10 +99,10 @@ num_classes = 4
 one_hot_labels = np.eye(num_classes)[labels].astype(float)
 
 # Initialize the model
-model = SentimentAnalysisModel(num_filters=10, filter_size=3, pool_size=2, hidden_units=10, num_classes=num_classes, learning_rate=0.01)
+model = SentimentAnalysisModel(num_filters=10, filter_size=3, pool_size=4, input_size=10, output_size=4, hidden_units=10, num_classes=num_classes, learning_rate=0.01)
 
 # Train the model
-model.train(X, labels, num_epochs=100, batch_size=32)
+model.train(X, labels, num_epochs=10, batch_size=10)
 
 # Test the model
 preds = model.predict(X)
