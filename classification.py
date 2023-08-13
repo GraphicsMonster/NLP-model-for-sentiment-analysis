@@ -7,17 +7,17 @@ class ClassificationLayer:
         self.weights = None
         self.biases = None
 
-    def initialize_parameters(self):
-        self.weights = np.random.randn(self.input_size, self.num_classes)
+    def initialize_parameters(self, inputs):
+        self.weights = np.random.randn(inputs.shape[1], self.num_classes)
         self.biases = np.random.randn(self.num_classes)
 
     def forward(self, inputs):
         if self.weights is None or self.biases is None:
-            self.initialize_parameters()
+            self.initialize_parameters(inputs)
 
-        outputs = np.dot(inputs, self.weights.T) + self.biases
+        outputs = np.dot(inputs, self.weights) + self.biases
         outputs = self.softmax(outputs)
-        print("output shape during classification layer's forward pass: ", outputs.shape)
+        # print("output shape during classification layer's forward pass: ", outputs.shape)
         return outputs
     
     def softmax(self, logits):
@@ -26,9 +26,10 @@ class ClassificationLayer:
         return exp_logits / np.sum(exp_logits, axis=1, keepdims=True)
     
     def loss(self, probs, targets):
-        num_samples = probs.shape[0]
-        loss = -np.sum(targets * np.log(probs)) / num_samples
-        return loss
+
+        loss = np.maximum(0, 1 - targets * probs) # hinge loss function
+
+        return loss.sum()
     
     def backward(self, probs, targets, learning_rate):
         num_samples = len(targets)
@@ -42,6 +43,6 @@ class ClassificationLayer:
         self.weights -= learning_rate * grad_weights
         self.biases -= learning_rate * grad_biases
 
-        print("output shape during classification layer's backpass: ", grad_inputs.shape)
+        # print("output shape during classification layer's backpass: ", grad_inputs.shape)
         return grad_inputs
 

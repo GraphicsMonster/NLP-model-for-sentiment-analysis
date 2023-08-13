@@ -30,34 +30,28 @@ class Conv1DLayer:
                     outputs[batch, output_sequence, filter] = np.sum(
                         self.inputs[batch, output_sequence:output_sequence + self.filter_size].T * self.weights[filter]).T + self.biases[filter]
         
-        print("outputs shape during convolution forward pass: ", outputs.shape)
+        # print("outputs shape during convolution forward pass: ", outputs.shape)
         return outputs
-    
+
     def backward(self, grad_outputs, learning_rate):
-        batch_size, _, input_sequence_length = self.inputs.shape
-        grad_inputs = np.zeros_like(self.inputs)
-        grad_weights = np.zeros_like(self.weights)
-        grad_biases = np.zeros_like(self.biases)
-        filter_size = self.filter_size
+        batch_size, output_sequence_length, num_filters = grad_outputs.shape
+        grad_inputs = np.zeros(self.inputs.shape)  # Initialize with the shape of the input
+        grad_filters = np.zeros_like(self.weights)  # Initialize with the shape of the weights
 
-        # Reshape grad_outputs to (batch_size, num_filters, input_sequence_length, 1)
-        grad_outputs_reshaped = grad_outputs[:, :, :, np.newaxis]
+        for batch in range(batch_size):
+            for filter_idx in range(self.num_filters):
+                for i in range(output_sequence_length):
+                    start = i
+                    end = i + self.filter_size
+                    grad_inputs[batch, start:end] += np.sum(grad_outputs[batch, i, filter_idx] * self.weights[filter_idx])
+                    grad_filters[filter_idx] += np.outer(grad_outputs[batch, i, filter_idx], self.inputs[batch, start:end])
 
-        # Compute gradients for inputs and weights using broadcasting
-        grad_inputs = np.sum(grad_outputs_reshaped * self.weights[:, :, :, np.newaxis], axis=1)
-        grad_weights = np.sum(grad_outputs_reshaped * self.inputs[:, np.newaxis, :, :], axis=0)
-
-        # Accumulate gradients across the batch
-        grad_biases = np.sum(grad_outputs, axis=(0, 2))
-
-        # Take average of gradients across the batch (if using mini-batch gradient descent)
-        grad_weights /= batch_size
-        grad_biases /= batch_size
-
-        # Update parameters using gradients
-        self.weights -= learning_rate * grad_weights
-        self.biases -= learning_rate * grad_biases
+        # Update filter weights and biases using gradients
+        self.weights -= learning_rate * grad_filters
+        self.biases -= learning_rate * np.sum(grad_outputs, axis=(0, 1))  # Update biases using sum of gradients
 
         return grad_inputs
+
+
 
 

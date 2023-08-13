@@ -29,7 +29,7 @@ class SentimentAnalysisModel:
         num_batches = X.shape[0] // batch_size
         total_loss = 0.0
         
-        labels = self.one_hot_encode(labels)
+        labels = self.one_hot_encode(labels, self.num_classes)
 
     # Training the model
         for epoch in range(num_epochs):
@@ -49,14 +49,18 @@ class SentimentAnalysisModel:
                 pool_output = self.pool_layer.forward(conv_output)
                 fc_output = self.fc_layer.forward(pool_output)
                 probs = self.classification_layer.forward(fc_output)
+                
+                print("final probs: ", probs)
 
                 # Compute loss for each sample
-                loss = np.mean([self.classification_layer.loss(prob, target) for prob, target in zip(probs, targets)])
+                loss = self.classification_layer.loss(probs, targets)
                 total_loss += loss
+                print("total loss at epoch {} : {}".format(epoch, loss))
 
                 # Backward pass
-                grad_probs = np.array([self.classification_layer.backward(prob, target, self.learning_rate) for prob, target in zip(probs, targets)])
+                grad_probs = self.classification_layer.backward(probs, targets, self.learning_rate)
                 grad_fc = self.fc_layer.backward(grad_probs, self.learning_rate)
+                grad_fc = grad_fc.reshape((pool_output.shape)) # reshape the gradient to match the input shape of the pooling layer
                 grad_pool = self.pool_layer.backward(grad_fc)
                 grad_conv = self.conv_layer.backward(grad_pool, self.learning_rate)
 
@@ -74,11 +78,13 @@ class SentimentAnalysisModel:
         # return the class with the highest probability
         return np.argmax(probs, axis=1)
     
-    def one_hot_encode(self, labels):
-        num_samples = len(labels)
-        num_classes = len(np.unique(labels))
-        one_hot_labels = np.zeros((num_samples, num_classes))
-        one_hot_labels[np.arange(num_samples), labels] = 1
+    def one_hot_encode(self, labels, num_classes):
+        
+        one_hot_labels = np.zeros((len(labels), num_classes))
+
+        for i in range(len(labels)):
+            one_hot_labels[i, labels[i]] = 1
+
         return one_hot_labels
 
 # Testing the model with a small dataset
@@ -105,6 +111,11 @@ model = SentimentAnalysisModel(num_filters=10, filter_size=3, pool_size=4, input
 model.train(X, labels, num_epochs=10, batch_size=10)
 
 # Test the model
+df = pd.read_csv(path)
+df = df[100 : 150]
+X, labels = preprocess_data(df)
+X, vocab = get_features(X)
+
 preds = model.predict(X)
 print(preds.shape)
 print(len(labels))

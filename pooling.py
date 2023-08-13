@@ -18,7 +18,7 @@ class PoolingLayer:
                     end = start + self.pool_size
                     self.output[batch, i, filter] = np.max(inputs[batch, start:end, filter])
 
-        print("output shape during pooling forward pass: ", self.output.shape)
+        # print("output shape during pooling forward pass: ", self.output.shape)
         return self.output
     
     def backward(self, grad_outputs):
@@ -33,5 +33,5 @@ class PoolingLayer:
                     end = start + self.pool_size
                     grad_inputs[batch, start:end, filter] = grad_outputs[batch, i, filter]
 
-        print("shape of the output of backpass of pooling layer: ", grad_inputs.shape)
+        # print("shape of the output of backpass of pooling layer: ", grad_inputs.shape)
         return grad_inputs
