@@ -32,7 +32,7 @@ class SentimentAnalysisModel:
         labels = self.one_hot_encode(labels, self.num_classes)
 
     # Training the model
-        for epoch in range(num_epochs):
+        for epoch in range(1, num_epochs+1):
             total_loss = 0.0
             num_batches = X.shape[0] // batch_size
 
@@ -55,7 +55,7 @@ class SentimentAnalysisModel:
                 # Compute loss for each sample
                 loss = self.classification_layer.loss(probs, targets)
                 total_loss += loss
-                print("total loss at epoch {} : {}".format(epoch, loss))
+                print("total loss at epoch {}, batch {} : {}".format(epoch, batch, loss))
 
                 # Backward pass
                 grad_probs = self.classification_layer.backward(probs, targets, self.learning_rate)
@@ -91,7 +91,7 @@ class SentimentAnalysisModel:
 
 path = './Dataset/dataset.csv'
 df = pd.read_csv(path)
-df = df[:100]
+df = df[:200]
 
 # Preprocess the data
 X, labels = preprocess_data(df)
@@ -105,14 +105,14 @@ num_classes = 4
 one_hot_labels = np.eye(num_classes)[labels].astype(float)
 
 # Initialize the model
-model = SentimentAnalysisModel(num_filters=10, filter_size=3, pool_size=4, input_size=10, output_size=4, hidden_units=10, num_classes=num_classes, learning_rate=0.01)
+model = SentimentAnalysisModel(num_filters=10, filter_size=3, pool_size=2, input_size=10, output_size=4, hidden_units=32, num_classes=num_classes, learning_rate=0.1)
 
 # Train the model
-model.train(X, labels, num_epochs=10, batch_size=10)
+model.train(X, labels, num_epochs=50, batch_size=32)
 
 # Test the model
 df = pd.read_csv(path)
-df = df[100 : 150]
+df = df[300: 350]
 X, labels = preprocess_data(df)
 X, vocab = get_features(X)
 

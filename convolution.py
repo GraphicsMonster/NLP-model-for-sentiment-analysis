@@ -17,7 +17,6 @@ class Conv1DLayer:
         if self.weights is None or self.biases is None:
             self.initialize_params(inputs.shape)
 
-        inputs = inputs.toarray()
         self.inputs = inputs[:, :, np.newaxis]
         batch_size, vocab_size = inputs.shape
         output_sequence_length = vocab_size - self.filter_size + 1
