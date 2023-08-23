@@ -38,9 +38,9 @@ def preprocess_labels(labels):
     #convert labels to integral values
     label_map = {
         'positive': 1,
-        'negative': -1,
+        'negative': 2,
         'uncertainty': 0,
-        'litigious': 2
+        'litigious': 3
     }
 
     # mapping labels to the label map
