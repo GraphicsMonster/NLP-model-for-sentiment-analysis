@@ -2,4 +2,5 @@ pandas
 numpy
 tensorflow
 scikit-learn
+torch
 nltk

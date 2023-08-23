@@ -14,6 +14,7 @@ The project has the following structure:
 - `pooling.py`: Implements pooling operation for the otuput of hte convolutional layer.
 - `fullyconnectedlayer.py`: Implements a simple fully connected layer connecting the outputs of the pooling layer to the hidden layers.
 - `model.py`: Implements the CNN model for sentiment analysis using the Conv1DLayer and other necessary layers.
+- `torch_test.py`: Contains code for training and evaluating the CNN model using PyTorch.
 
 ## Dependencies
 
