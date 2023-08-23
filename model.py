@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from preprocess import preprocess_data
 from features import get_features
 from convolution import Conv1DLayer
@@ -31,6 +32,13 @@ class SentimentAnalysisModel:
         
         labels = self.one_hot_encode(labels, self.num_classes)
 
+        # Initialize the lists to store the gradients
+        grad_norms_conv = []
+        grad_norms_pool = []
+        grad_norms_fc = []
+        grad_norms_probs = []
+        losses = []
+
     # Training the model
         for epoch in range(1, num_epochs+1):
             total_loss = 0.0
@@ -55,6 +63,7 @@ class SentimentAnalysisModel:
                 # Compute loss for each sample
                 loss = self.classification_layer.loss(probs, targets)
                 total_loss += loss
+                losses.append(loss)
                 print("total loss at epoch {}, batch {} : {}".format(epoch, batch, loss))
 
                 # Backward pass
@@ -64,9 +73,47 @@ class SentimentAnalysisModel:
                 grad_pool = self.pool_layer.backward(grad_fc)
                 grad_conv = self.conv_layer.backward(grad_pool, self.learning_rate)
 
+                # Calculate gradient norms
+                grad_norm_conv = np.linalg.norm(grad_conv)
+                grad_norm_pool = np.linalg.norm(grad_pool)
+                grad_norm_fc = np.linalg.norm(grad_fc)
+                grad_norm_probs = np.linalg.norm(grad_probs)
+
+                # Append gradient norms to respective lists
+                grad_norms_conv.append(grad_norm_conv)
+                grad_norms_pool.append(grad_norm_pool)
+                grad_norms_fc.append(grad_norm_fc)
+                grad_norms_probs.append(grad_norm_probs)
+
             # Print the loss every 10 epochs
             if epoch % 10 == 0:
                 print("Epoch {}: loss = {}".format(epoch, total_loss))
+
+            
+            # Plot the gradient norms and losses
+            plt.figure(figsize=(15, 5))
+
+            plt.subplot(1, 2, 1)
+            plt.plot(grad_norms_conv, label='Conv Layer')
+            plt.plot(grad_norms_pool, label='Pool Layer')
+            plt.plot(grad_norms_fc, label='Fully Connected Layer')
+            plt.plot(grad_norms_probs, label='Classification Layer')
+            plt.title("Gradient Norms During Training")
+            plt.xlabel("Training Iteration")
+            plt.ylabel("Gradient Norm")
+            plt.legend()
+            plt.grid()
+
+            plt.subplot(1, 2, 2)
+            plt.plot(losses, label='Loss')
+            plt.title("Loss During Training")
+            plt.xlabel("Epoch")
+            plt.ylabel("Loss")
+            plt.legend()
+            plt.grid()
+
+            plt.tight_layout()
+            plt.show()
 
 
     def predict(self, X):
@@ -105,10 +152,10 @@ num_classes = 4
 one_hot_labels = np.eye(num_classes)[labels].astype(float)
 
 # Initialize the model
-model = SentimentAnalysisModel(num_filters=10, filter_size=3, pool_size=2, input_size=10, output_size=4, hidden_units=32, num_classes=num_classes, learning_rate=0.1)
+model = SentimentAnalysisModel(num_filters=10, filter_size=3, pool_size=2, input_size=10, output_size=4, hidden_units=32, num_classes=num_classes, learning_rate=1e-12)
 
 # Train the model
-model.train(X, labels, num_epochs=50, batch_size=32)
+model.train(X, labels, num_epochs=10, batch_size=32)
 
 # Test the model
 df = pd.read_csv(path)
