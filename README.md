@@ -11,22 +11,27 @@ The project has the following structure:
 - `preprocess.py`: Contains preprocessing functions for text data, including tokenization, removal of stopwords, and lemmatization.
 - `features.py`: Contains functions for extracting features from preprocessed text data using the bag-of-words approach.
 - `convolution.py`: Implements the Conv1DLayer class for performing convolution operations in the CNN model.
+- `pooling.py`: Implements pooling operation for the otuput of hte convolutional layer.
+- `fullyconnectedlayer.py`: Implements a simple fully connected layer connecting the outputs of the pooling layer to the hidden layers.
 - `model.py`: Implements the CNN model for sentiment analysis using the Conv1DLayer and other necessary layers.
-- `train.py`: Contains the training script for the CNN model.
-- `evaluate.py`: Contains the evaluation script for the trained model.
 
 ## Dependencies
 
 The project requires the following dependencies:
 
-- Python 3.7 or higher
+- Python 3.9 or higher
 - numpy
 - pandas
 - nltk
 - scikit-learn
-- tensorflow (or any other deep learning framework of your choice)
+- tensorflow
+- torch
 
 Ensure that you have the necessary dependencies installed before running the project.
+
+or just type this in your console:
+
+`pip install -r requirements.txt`
 
 ## Contributing
 
